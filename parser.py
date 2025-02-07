@@ -1,6 +1,7 @@
 import csv
 import config
 import logging
+import time
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -96,6 +97,7 @@ def write_port_protocol_counts(port_protocol_counts, output_file):
         raise
 
 if __name__ == "__main__":
+    start_time = time.time()
     lookup_table = load_lookup_table(config.LOOKUP_FILE)
     protocol_map = load_protocol_map(config.PROTOCOL_FILE)
     tag_counts, port_protocol_counts = process_flow_logs(config.FLOW_LOG_FILE, lookup_table, protocol_map)
@@ -104,3 +106,5 @@ if __name__ == "__main__":
     write_port_protocol_counts(port_protocol_counts, config.PORT_PROTOCOL_OUTPUT_FILE)
     
     logging.info(f"Output saved to {config.TAG_OUTPUT_FILE} and {config.PORT_PROTOCOL_OUTPUT_FILE}")
+    end_time = time.time()
+    logging.info(f"Time taken : {round((end_time - start_time),4)}s")
