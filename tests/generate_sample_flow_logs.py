@@ -2,7 +2,7 @@ import random
 import time
 import csv
 
-FLOW_LOG_FILE = "flow_logs_10MB.txt"
+FLOW_LOG_FILE = "../log-samples/flow_logs_10MB.txt"
 MAX_FILE_SIZE = 10 * 1024 * 1024
 
 with open('../maps/protocol_mapping.csv', 'r') as protocol_maps:

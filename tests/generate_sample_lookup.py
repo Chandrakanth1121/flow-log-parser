@@ -1,7 +1,7 @@
 import random
 import csv
 
-LOOKUP_FILE = "lookup_10000.csv"
+LOOKUP_FILE = "../maps/lookup_table_10000.csv"
 
 with open('../maps/protocol_mapping.csv', 'r') as protocol_maps:
   reader = csv.DictReader(protocol_maps)
