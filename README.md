@@ -34,6 +34,7 @@ python3 -m unittest ./tests/unit_tests.py
 ```
 python3 parser.py
 ```
+This script reads the lookup table from `./maps/lookup_table.csv`, protocol map from `./maps/protocol_mapping.csv`, flow log file from `./log-samples/flow_logs.txt`, create dictionaries for lookup table and protocol map and then iterate over all logs to count the tags based on port/protocol combination. It also simultaneously counts the combinations of port/protocols.
 
 4. You wiil see the outputs in:
 
