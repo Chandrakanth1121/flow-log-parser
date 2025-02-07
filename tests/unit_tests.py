@@ -11,14 +11,16 @@ class TestParser(unittest.TestCase):
         self.lookup_file = tempfile.NamedTemporaryFile(delete=False, mode='w')
         self.lookup_file.write("dstport,protocol,tag\n")
         self.lookup_file.write("443,tcp,https\n")
-        self.lookup_file.write("80,tcp,http\n")
+        self.lookup_file.write("80,tcp,HTTP\n") # Made HTTP uppercase to test case insensitivity
         self.lookup_file.write("23,tcp,telnet\n")
+        self.lookup_file.write("20,GMTP,telnet\n") # To test tag mapping to multiple port/protocol combinations (23,tcp and 20,GMTP both map to telnet. Ofcourse hypothetically)
         self.lookup_file.close()
 
         self.protocol_file = tempfile.NamedTemporaryFile(delete=False, mode='w')
         self.protocol_file.write("Decimal,Keyword,Protocol,IPv6 Extension Header,Reference\n")
-        self.protocol_file.write("6,TCP,Transmission Control,,[RFC9293]\n")
+        self.protocol_file.write("6,TCP,Transmission Control,,[RFC9293]\n") # Made TCP & UDP uppercase to test case insensitivity
         self.protocol_file.write("17,UDP,User Datagram,,[RFC768][Jon_Postel]\n")
+        self.protocol_file.write("100,GMTP,GMTP,,[[RXB5]]\n")
         self.protocol_file.close()
 
         self.flow_log_file = tempfile.NamedTemporaryFile(delete=False, mode='w')
@@ -29,6 +31,7 @@ class TestParser(unittest.TestCase):
         self.flow_log_file.write("2 123456789012 eni-0a1b2c3d 10.0.1.201 198.51.100.2 49153 23 6 25 20000 1620140761 1620140821 ACCEPT OK\n")
         self.flow_log_file.write("2 123456789012 eni-0a1b2c3d 10.0.1.201 198.51.100.2 49153 80 6 25 20000 1620140761 1620140821 ACCEPT OK\n")
         self.flow_log_file.write("2 123456789012 eni-0a1b2c3d 10.0.1.201 198.51.100.2 49153 443 6 25 20000 1620140761 1620140821 ACCEPT OK\n")
+        self.flow_log_file.write("2 123456789012 eni-0a1b2c3d 10.0.1.201 198.51.100.2 49153 20 100 25 20000 1620140761 1620140821 ACCEPT OK\n")
         self.flow_log_file.close()
 
     def tearDown(self):
@@ -41,11 +44,13 @@ class TestParser(unittest.TestCase):
         self.assertEqual(lookup.get(('443', 'tcp')), 'https')
         self.assertEqual(lookup.get(('80', 'tcp')), 'http')
         self.assertEqual(lookup.get(('23', 'tcp')), 'telnet')
+        self.assertEqual(lookup.get(('20', 'gmtp')), 'telnet')
 
     def test_load_protocol_map(self):
         protocol_map = parser.load_protocol_map(self.protocol_file.name)
         self.assertEqual(protocol_map.get('6'), 'tcp')
         self.assertEqual(protocol_map.get('17'), 'udp')
+        self.assertEqual(protocol_map.get('100'), 'gmtp')
 
     def test_process_flow_logs(self):
         lookup = parser.load_lookup_table(self.lookup_file.name)
@@ -54,7 +59,7 @@ class TestParser(unittest.TestCase):
 
         self.assertEqual(tag_counts.get('https'), 2)
         self.assertEqual(tag_counts.get('http'), 4)
-        self.assertEqual(tag_counts.get('telnet'), 1)
+        self.assertEqual(tag_counts.get('telnet'), 2)
         self.assertEqual(port_protocol_counts.get(('443', 'tcp')), 2)
         self.assertEqual(port_protocol_counts.get(('80', 'tcp')), 4)
         self.assertEqual(port_protocol_counts.get(('23', 'tcp')), 1)
