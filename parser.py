@@ -65,7 +65,7 @@ def process_flow_logs(flow_log_file, lookup, protocol_map):
                 tag_counts[tag] = tag_counts.get(tag,0) + 1
                 port_protocol_counts[key] = port_protocol_counts.get(key,0) + 1
     except FileNotFoundError:
-        logging.error(f"{protocol_file} file not found")
+        logging.error(f"{flow_log_file} file not found")
         raise
     
     return tag_counts, port_protocol_counts
