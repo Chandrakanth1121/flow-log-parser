@@ -1,0 +1,5 @@
+LOOKUP_FILE = "./maps/lookup_table.csv"
+PROTOCOL_FILE = "./maps/protocol_mapping.csv"
+FLOW_LOG_FILE = "./log-samples/flow_logs.txt"
+TAG_OUTPUT_FILE = "./outputs/tag_counts.csv"
+PORT_PROTOCOL_OUTPUT_FILE = "./outputs/port_protocol_counts.csv"
